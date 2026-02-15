@@ -10,6 +10,9 @@ Script calls benchmark.sh in each lang folder, benchmark produces results.txt
 
 Add test flag for script?
 
+Single data type for all langs. 
+array? in place?
+
 ### opts for script
 
 - n | how many elements to sort
@@ -19,6 +22,7 @@ Add test flag for script?
 ## Tools:
 
 - gnuplot
+- bashly
 
 ## Languages 
 - [ ]  c
