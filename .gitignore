@@ -2,3 +2,6 @@
 ## User-specific stuff
 .idea/
 target/
+
+# ------ Project ------ 
+algorithms/**/*.csv
