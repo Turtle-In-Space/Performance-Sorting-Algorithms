@@ -39,7 +39,7 @@ run_scripts_with_params() {
   local name="$2"
   local -n script_args_ref="$3"
 
-  if (( ${#scripts_ref[@]} )); then
+  if (( ${#scripts_ref[@]} == 0 )); then
     print_warn "No scripts found!"
     return 0
   fi
@@ -60,7 +60,15 @@ get_scripts() {
   local algo="${args[--algo]//,/|}"
   local lang="${args[--lang]//,/|}"
 
-  find $algos_folder -name "$type.sh" | grep -E "/$algo" | grep -E "/$lang" 
+  if [[ -n $algo ]]; then
+    algo="/$algo"
+  fi
+
+  if [[ -n $lang ]]; then
+    lang="/$lang"
+  fi
+
+  find $algos_folder -name "$type.sh" | grep -E "$algo" | grep -E "$lang" 
 }
 
 print_stack_trace() {
