@@ -13,7 +13,8 @@ remove_files() {
 }
 
 run_clean_scripts() {
-  local scripts=$(get_scripts "clean")
+  local -a scripts
+  mapfile -t scripts < <(get_scripts "clean")
 
   run_scripts scripts "clean"
 }

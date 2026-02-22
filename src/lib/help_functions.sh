@@ -1,6 +1,3 @@
-set -Eeo pipefail
-trap 'print_stack_trace' ERR
-
 print_ok() {
   echo "$(green [+])" "$@"
 }
@@ -42,7 +39,7 @@ run_scripts_with_params() {
   local name="$2"
   local -n script_args_ref="$3"
 
-  if ((${#scripts_ref[@]} == 0)); then
+  if (( ${#scripts_ref[@]} )); then
     print_warn "No scripts found!"
     return 0
   fi
@@ -63,7 +60,7 @@ get_scripts() {
   local algo="${args[--algo]//,/|}"
   local lang="${args[--lang]//,/|}"
 
-  find $algos_folder -name "$type.sh" | grep -E "$algo" | grep -E "$lang" 
+  find $algos_folder -name "$type.sh" | grep -E "/$algo" | grep -E "/$lang" 
 }
 
 print_stack_trace() {

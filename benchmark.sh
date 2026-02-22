@@ -308,9 +308,6 @@ black_underlined() { print_in_color "\e[4;30m" "$*"; }
 white_underlined() { print_in_color "\e[4;37m" "$*"; }
 
 # src/lib/help_functions.sh
-set -Eeo pipefail
-trap 'print_stack_trace' ERR
-
 print_ok() {
   echo "$(green [+])" "$@"
 }
@@ -352,7 +349,7 @@ run_scripts_with_params() {
   local name="$2"
   local -n script_args_ref="$3"
 
-  if ((${#scripts_ref[@]} == 0)); then
+  if (( ${#scripts_ref[@]} )); then
     print_warn "No scripts found!"
     return 0
   fi
@@ -373,7 +370,7 @@ get_scripts() {
   local algo="${args[--algo]//,/|}"
   local lang="${args[--lang]//,/|}"
 
-  find $algos_folder -name "$type.sh" | grep -E "$algo" | grep -E "$lang"
+  find $algos_folder -name "$type.sh" | grep -E "/$algo" | grep -E "/$lang"
 
 }
 
@@ -406,7 +403,8 @@ outfile="$plot_folder/graph.png"
 benchmark.sh_build_command() {
 
   # src/commands/build.sh
-  local scripts=$(get_scripts "build")
+  local -a scripts
+  mapfile -t scripts < <(get_scripts "build")
   run_scripts scripts "build"
 
 }
@@ -430,7 +428,8 @@ benchmark.sh_clean_command() {
   }
 
   run_clean_scripts() {
-    local scripts=$(get_scripts "clean")
+    local -a scripts
+    mapfile -t scripts < <(get_scripts "clean")
 
     run_scripts scripts "clean"
   }
