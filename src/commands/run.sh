@@ -1,5 +1,10 @@
-echo "# This file is located at 'src/commands/run.sh'."
-echo "# It contains the implementation for the 'benchmark.sh run' command."
-echo "# The code you write here will be wrapped by a function named 'benchmark.sh_run_command()'."
-echo "# Feel free to edit this file; your changes will persist when regenerating."
-inspect_args
+algos="algorithms/"
+
+mapfile -t scripts < <(find $algos -name "run.sh")
+
+tmp=("${args[--lower]}" "${args[--upper]}" "${args[--step]}" "${args[--iter]}")
+[ -n "${args[--out]}" ] && tmp+=("${args[--out]}")
+
+for f in ${scripts[@]}; do
+  ./$f ${tmp[@]}
+done;

@@ -97,7 +97,7 @@ benchmark.sh_run_usage() {
   printf "benchmark.sh run - Runs all scripts\n\n"
 
   printf "%s\n" "$(bold "Usage:")"
-  printf "  benchmark.sh run\n"
+  printf "  benchmark.sh run [OPTIONS]\n"
   printf "  benchmark.sh run --help | -h\n"
   echo
 
@@ -105,6 +105,32 @@ benchmark.sh_run_usage() {
   if [[ -n "$long_usage" ]]; then
     # :command.usage_options
     printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_flags
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--lower, -l LOWER (required)")"
+    printf "\n"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--upper, -u UPPER (required)")"
+    printf "\n"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--step, -s STEP (required)")"
+    printf "\n"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--iter, -i ITER (required)")"
+    printf "\n"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--out, -o OUT")"
+    printf "\n"
+    echo
 
     # :command.usage_fixed_flags
     printf "  %s\n" "$(magenta "--help, -h")"
@@ -271,9 +297,14 @@ benchmark.sh_clean_command() {
   algos="algorithms/"
 
   mapfile -t scripts < <(find $algos -name "clean.sh")
+  mapfile -t data < <(find $algos -name "data.csv")
 
   for f in ${scripts[@]}; do
     ./$f
+  done;
+
+  for f in ${data[@]}; do
+    rm $f
   done;
 
 }
@@ -282,11 +313,16 @@ benchmark.sh_clean_command() {
 benchmark.sh_run_command() {
 
   # src/commands/run.sh
-  echo "# This file is located at 'src/commands/run.sh'."
-  echo "# It contains the implementation for the 'benchmark.sh run' command."
-  echo "# The code you write here will be wrapped by a function named 'benchmark.sh_run_command()'."
-  echo "# Feel free to edit this file; your changes will persist when regenerating."
-  inspect_args
+  algos="algorithms/"
+
+  mapfile -t scripts < <(find $algos -name "run.sh")
+
+  tmp=("${args[--lower]}" "${args[--upper]}" "${args[--step]}" "${args[--iter]}")
+  [ -n "${args[--out]}" ] && tmp+=("${args[--out]}")
+
+  for f in ${scripts[@]}; do
+    ./$f ${tmp[@]}
+  done;
 
 }
 
@@ -520,6 +556,75 @@ benchmark.sh_run_parse_requirements() {
   while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
+      # :flag.case
+      --lower | -l)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--lower']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--lower requires an argument: --lower, -l LOWER" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --upper | -u)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--upper']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--upper requires an argument: --upper, -u UPPER" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --step | -s)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--step']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--step requires an argument: --step, -s STEP" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --iter | -i)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--iter']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--iter requires an argument: --iter, -i ITER" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --out | -o)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--out']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--out requires an argument: --out, -o OUT" >&2
+          exit 1
+        fi
+        ;;
 
       -?*)
         printf "invalid option: %s\n" "$key" >&2
@@ -536,6 +641,24 @@ benchmark.sh_run_parse_requirements() {
 
     esac
   done
+
+  # :command.required_flags_filter
+  if [[ -z ${args['--lower']+x} ]]; then
+    printf "missing required flag: --lower, -l LOWER\n" >&2
+    exit 1
+  fi
+  if [[ -z ${args['--upper']+x} ]]; then
+    printf "missing required flag: --upper, -u UPPER\n" >&2
+    exit 1
+  fi
+  if [[ -z ${args['--step']+x} ]]; then
+    printf "missing required flag: --step, -s STEP\n" >&2
+    exit 1
+  fi
+  if [[ -z ${args['--iter']+x} ]]; then
+    printf "missing required flag: --iter, -i ITER\n" >&2
+    exit 1
+  fi
 
 }
 
