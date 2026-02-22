@@ -1,6 +1,6 @@
 name: benchmark.sh
-help: Sample minimal application without commands
-version: 0.1.0
+help: Benchmark sorting algorithms and plot them against eachother
+version: 0.2.0
 
 # Properties that are used by the mandoc renderer
 x_mandoc_authors: Elias Svensson

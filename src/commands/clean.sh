@@ -15,3 +15,4 @@ for f in ${data[@]}; do
 done;
 
 rm $outfile
+print_ok "Done"

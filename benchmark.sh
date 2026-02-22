@@ -17,7 +17,7 @@ version_command() {
 
 # :command.usage
 benchmark.sh_usage() {
-  printf "benchmark.sh - Sample minimal application without commands\n\n"
+  printf "benchmark.sh - Benchmark sorting algorithms and plot them against eachother\n\n"
 
   printf "%s\n" "$(bold "Usage:")"
   printf "  benchmark.sh COMMAND\n"
@@ -338,6 +338,7 @@ benchmark.sh_clean_command() {
   done;
 
   rm $outfile
+  print_ok "Done"
 
 }
 
