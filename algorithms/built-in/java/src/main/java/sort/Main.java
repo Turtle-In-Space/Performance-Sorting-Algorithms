@@ -11,15 +11,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
-
-
 public class Main {
     public static void main(String[] args) {
         Options opts = setOptions();
 
         CommandLine cmd = null;
         int lower = 0, upper = 0, step = 0, iter = 0;
-        String outfile = "";
 
         try {
             var parser = new DefaultParser();
@@ -29,7 +26,7 @@ public class Main {
             upper = Integer.parseInt(cmd.getParsedOptionValue("u"));
             step = Integer.parseInt(cmd.getParsedOptionValue("s"));
             iter = Integer.parseInt(cmd.getParsedOptionValue("i"));
-            outfile = cmd.getOptionValue("o");
+
         } catch (ParseException e) {
             System.out.println("[!] error reading args: " + e);
             System.exit(1);
@@ -62,7 +59,7 @@ public class Main {
         int[] data = new int[n];
         var rand = new Random();
 
-        for(int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) {
             data[i] = rand.nextInt(Integer.MAX_VALUE);
         }
 
@@ -98,7 +95,7 @@ public class Main {
             return;
         }
 
-        try{
+        try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
             writer.append(out);
             writer.close();
