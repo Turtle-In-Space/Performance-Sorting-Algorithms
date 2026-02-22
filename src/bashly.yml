@@ -8,6 +8,18 @@ x_mandoc_footer: |-
   # ISSUE TRACKER
   Report issues at https://github.com/Turtle-In-Space/Performance-Sorting-Algorithms
 
+variables:
+  # ----- Folders ----- #
+  - name: plot_folder
+    value: plotting/
+  - name: algos_folder
+    value: algorithms/
+  # ----- Files ----- #
+  - name: plot_script
+    value: $plot_folder/plot.gp
+  - name: outfile
+    value: $plot_folder/graph.png
+
 commands:
   - import: src/commands/build.yml
   - import: src/commands/clean.yml

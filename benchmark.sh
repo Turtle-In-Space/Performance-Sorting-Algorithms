@@ -384,13 +384,6 @@ print_err() {
 }
 
 # src/lib/variables.sh
-# ----- Folders ----- #
-plot_folder="./plotting"
-algos_folder="algorithms/"
-
-# ----- Files ----- #
-plot_script="$plot_folder/plot.gp"
-outfile="$plot_folder/graph.png"
 
 # :command.command_functions
 # :command.function
@@ -931,6 +924,19 @@ benchmark.sh_plot_parse_requirements() {
 initialize() {
   declare -g version="0.2.0"
   set -e
+
+  # :command.variables
+  # :variable.definition
+  declare -g plot_folder="plotting/"
+
+  # :variable.definition
+  declare -g algos_folder="algorithms/"
+
+  # :variable.definition
+  declare -g plot_script="$plot_folder/plot.gp"
+
+  # :variable.definition
+  declare -g outfile="$plot_folder/graph.png"
 
 }
 
