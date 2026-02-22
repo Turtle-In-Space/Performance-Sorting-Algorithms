@@ -1,0 +1,9 @@
+# ----- Build command ----- #
+name: build
+help: Compiles and builds all scripts
+
+args:
+
+flags:
+
+examples:

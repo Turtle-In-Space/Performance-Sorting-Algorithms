@@ -9,75 +9,9 @@ x_mandoc_footer: |-
   Report issues at https://github.com/Turtle-In-Space/Performance-Sorting-Algorithms
 
 commands:
-# ----- Build command ----- #
-#  Compiles and builds all scripts
-- name: build
-  help: Compiles and builds all scripts
-
-  args:
-
-  flags:
-
-  examples:
-# ----- #
-
-# ----- Clean command ----- #
-#  Deletes all build files
-- name: clean
-  help: Deletes all build files
-
-  args:
-
-  flags:
-
-  examples:
-# ----- #
-
-# ----- Run command ----- #
-#  Runs all scripts
-- name: run
-  help: Runs all scripts
-
-  flags:
-    - long: --lower
-      short: -l
-      arg: lower
-      required: yes
-
-    - long: --upper
-      short: -u
-      arg: upper
-      required: yes
-
-    - long: --step
-      short: -s
-      arg: step
-      required: yes
-
-    - long: --iter
-      short: -i
-      arg: iter
-      required: yes
-
-    - long: --out
-      short: -o
-      arg: out
-
-  examples:
-# ----- #
-
-# ----- Plot command ----- #
-#  Plots all data collected with Run command
-- name: plot
-  help: Plots all data collected with Run command
-
-  args:
-
-  flags:
-
-  examples:
-# ----- #
-
+  - import: src/commands/build.yml
+  - import: src/commands/clean.yml
+  - import: src/commands/run.yml
+  - import: src/commands/plot.yml
 
 examples:
-  

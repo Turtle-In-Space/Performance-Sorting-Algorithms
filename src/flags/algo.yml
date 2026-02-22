@@ -1,0 +1,3 @@
+long: --algo
+arg: algo
+help: Name of sorting algorithms [SORT1,SORT2,...]

@@ -1,0 +1,33 @@
+# ----- Run command ----- #
+name: run
+help: Runs all sorting algorithms
+
+flags:
+  - long: --lower
+    short: -l
+    arg: lower
+    required: yes
+
+  - long: --upper
+    short: -u
+    arg: upper
+    required: yes
+
+  - long: --step
+    short: -s
+    arg: step
+    required: yes
+
+  - long: --iter
+    short: -i
+    arg: iter
+    required: yes
+
+  - long: --out
+    short: -o
+    arg: out
+
+  - import: src/flags/algo.yml
+  - import: src/flags/lang.yml
+
+examples:

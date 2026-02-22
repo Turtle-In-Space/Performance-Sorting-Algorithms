@@ -1,0 +1,11 @@
+# ----- Clean command ----- #
+name: clean
+help: Deletes all build- and program made files
+
+args:
+
+flags:
+  - import: src/flags/lang.yml
+  - import: src/flags/algo.yml
+
+examples:
