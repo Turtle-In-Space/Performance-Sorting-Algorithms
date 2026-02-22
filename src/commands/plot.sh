@@ -1,5 +1,18 @@
-echo "# This file is located at 'src/commands/plot.sh'."
-echo "# It contains the implementation for the 'benchmark.sh plot' command."
-echo "# The code you write here will be wrapped by a function named 'benchmark.sh_plot_command()'."
-echo "# Feel free to edit this file; your changes will persist when regenerating."
-inspect_args
+plot_folder="./plotting"
+algos="algorithms/"
+plot_script="$plot_folder/plot.gp"
+outfile="$plot_folder/graph.png"
+names=()
+
+mapfile -t files < <(find $algos -name "*.csv")
+
+# make filepath into proper name
+for f in "${files[@]}"; do
+  # strip algo folder, remove slashes and add to names
+  names+=("$(dirname ${f#"$algos"} | sed 's/\//-/')")
+done
+
+files_str="${files[*]}"
+names_str="${names[*]}"
+
+gnuplot -e "files='$files_str'; names='$names_str'; out='$outfile'" $plot_script

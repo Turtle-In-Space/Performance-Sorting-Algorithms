@@ -10,3 +10,5 @@ done;
 for f in ${data[@]}; do
   rm $f
 done;
+
+rm ./plotting/graph.png

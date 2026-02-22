@@ -307,6 +307,8 @@ benchmark.sh_clean_command() {
     rm $f
   done;
 
+  rm ./plotting/graph.png
+
 }
 
 # :command.function
@@ -330,11 +332,22 @@ benchmark.sh_run_command() {
 benchmark.sh_plot_command() {
 
   # src/commands/plot.sh
-  echo "# This file is located at 'src/commands/plot.sh'."
-  echo "# It contains the implementation for the 'benchmark.sh plot' command."
-  echo "# The code you write here will be wrapped by a function named 'benchmark.sh_plot_command()'."
-  echo "# Feel free to edit this file; your changes will persist when regenerating."
-  inspect_args
+  plot_folder="./plotting"
+  algos="algorithms/"
+  plot_script="$plot_folder/plot.gp"
+  outfile="$plot_folder/graph.png"
+  names=()
+
+  mapfile -t files < <(find $algos -name "*.csv")
+
+  for f in "${files[@]}"; do
+    names+=("$(dirname ${f#"$algos"} | sed 's/\//-/')")
+  done
+
+  files_str="${files[*]}"
+  names_str="${names[*]}"
+
+  gnuplot -e "files='$files_str'; names='$names_str'; out='$outfile'" $plot_script
 
 }
 
