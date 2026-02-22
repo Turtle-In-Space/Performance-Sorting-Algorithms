@@ -1,7 +1,3 @@
-plot_folder="./plotting"
-algos="algorithms/"
-plot_script="$plot_folder/plot.gp"
-outfile="$plot_folder/graph.png"
 names=()
 
 mapfile -t files < <(find $algos -name "*.csv")

@@ -275,18 +275,45 @@ cyan_underlined() { print_in_color "\e[4;36m" "$*"; }
 black_underlined() { print_in_color "\e[4;30m" "$*"; }
 white_underlined() { print_in_color "\e[4;37m" "$*"; }
 
+# src/lib/help_functions.sh
+print_ok() {
+  echo "$(green [+])" "$@"
+}
+
+print_info() {
+  echo "$(blue [*])" "$@"
+}
+
+print_warn() {
+  echo "$(orange [-])" "$@"
+}
+
+print_err() {
+  echo "$(red [!])" "$@"
+}
+
+# src/lib/variables.sh
+# ----- Folders ----- #
+plot_folder="./plotting"
+algos="algorithms/"
+
+# ----- Files ----- #
+plot_script="$plot_folder/plot.gp"
+outfile="$plot_folder/graph.png"
+
 # :command.command_functions
 # :command.function
 benchmark.sh_build_command() {
 
   # src/commands/build.sh
-  algos="algorithms/"
-
   mapfile -t scripts < <(find $algos -name "build.sh")
 
+  print_info "Starting build scripts..."
   for f in ${scripts[@]}; do
+    print_info "Running:" $f
     ./$f
   done;
+  print_ok "Done"
 
 }
 
@@ -294,20 +321,23 @@ benchmark.sh_build_command() {
 benchmark.sh_clean_command() {
 
   # src/commands/clean.sh
-  algos="algorithms/"
-
   mapfile -t scripts < <(find $algos -name "clean.sh")
-  mapfile -t data < <(find $algos -name "data.csv")
 
+  print_info "Starting clean scripts..."
   for f in ${scripts[@]}; do
+    print_info "Running:" $f
     ./$f
   done;
+  print_ok "Done"
 
+  mapfile -t data < <(find $algos -name "data.csv")
+
+  print_info "Removing created files..."
   for f in ${data[@]}; do
     rm $f
   done;
 
-  rm ./plotting/graph.png
+  rm $outfile
 
 }
 
@@ -315,16 +345,20 @@ benchmark.sh_clean_command() {
 benchmark.sh_run_command() {
 
   # src/commands/run.sh
-  algos="algorithms/"
-
   mapfile -t scripts < <(find $algos -name "run.sh")
 
   tmp=("${args[--lower]}" "${args[--upper]}" "${args[--step]}" "${args[--iter]}")
+
   [ -n "${args[--out]}" ] && tmp+=("${args[--out]}")
 
+  print_info "Starting run scripts..."
+
   for f in ${scripts[@]}; do
+    print_info "Running:" $f
     ./$f ${tmp[@]}
   done;
+
+  print_ok "Done"
 
 }
 
@@ -332,15 +366,13 @@ benchmark.sh_run_command() {
 benchmark.sh_plot_command() {
 
   # src/commands/plot.sh
-  plot_folder="./plotting"
-  algos="algorithms/"
-  plot_script="$plot_folder/plot.gp"
-  outfile="$plot_folder/graph.png"
   names=()
 
   mapfile -t files < <(find $algos -name "*.csv")
 
+  # make filepath into proper name
   for f in "${files[@]}"; do
+    # strip algo folder, remove slashes and add to names
     names+=("$(dirname ${f#"$algos"} | sed 's/\//-/')")
   done
 
