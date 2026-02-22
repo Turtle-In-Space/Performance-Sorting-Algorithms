@@ -308,22 +308,6 @@ black_underlined() { print_in_color "\e[4;30m" "$*"; }
 white_underlined() { print_in_color "\e[4;37m" "$*"; }
 
 # src/lib/help_functions.sh
-print_ok() {
-  echo "$(green [+])" "$@"
-}
-
-print_info() {
-  echo "$(blue [*])" "$@"
-}
-
-print_warn() {
-  echo "$(yellow [-])" "$@"
-}
-
-print_err() {
-  echo "$(red [!])" "$@"
-}
-
 run_scripts() {
   local -n scripts_ref="$1"
   local name="$2"
@@ -382,19 +366,21 @@ get_scripts() {
 
 }
 
-print_stack_trace() {
-  local exit_code=$?
+# src/lib/out_message.sh
+print_ok() {
+  echo "$(green [+])" "$@"
+}
 
-  echo "Error (exit code $exit_code)"
-  echo "Stack trace:"
+print_info() {
+  echo "$(blue [*])" "$@"
+}
 
-  for ((i=${#FUNCNAME[@]}-1; i>=1; i--)); do
-    local func="${FUNCNAME[i]}"
-    local line="${BASH_LINENO[i-1]}"
-    local file="${BASH_SOURCE[i]}"
+print_warn() {
+  echo "$(yellow [-])" "$@"
+}
 
-    printf '  at %s (%s:%s)\n' "$func" "$file" "$line"
-  done
+print_err() {
+  echo "$(red [!])" "$@"
 }
 
 # src/lib/variables.sh

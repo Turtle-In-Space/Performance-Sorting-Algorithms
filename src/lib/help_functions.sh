@@ -1,19 +1,3 @@
-print_ok() {
-  echo "$(green [+])" "$@"
-}
-
-print_info() {
-  echo "$(blue [*])" "$@"
-}
-
-print_warn() {
-  echo "$(yellow [-])" "$@"
-}
-
-print_err() {
-  echo "$(red [!])" "$@"
-}
-
 run_scripts() {
   local -n scripts_ref="$1"
   local name="$2"
@@ -69,19 +53,4 @@ get_scripts() {
   fi
 
   find $algos_folder -name "$type.sh" | grep -E "$algo" | grep -E "$lang" 
-}
-
-print_stack_trace() {
-  local exit_code=$?
-
-  echo "Error (exit code $exit_code)"
-  echo "Stack trace:"
-
-  for ((i=${#FUNCNAME[@]}-1; i>=1; i--)); do
-    local func="${FUNCNAME[i]}"
-    local line="${BASH_LINENO[i-1]}"
-    local file="${BASH_SOURCE[i]}"
-
-    printf '  at %s (%s:%s)\n' "$func" "$file" "$line"
-  done
 }
