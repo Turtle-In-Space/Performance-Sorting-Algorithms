@@ -1,18 +1,22 @@
-mapfile -t scripts < <(find $algos -name "clean.sh")
+remove_files() {
+  local -a data
+  
+  print_info "Removing created files..."
 
-print_info "Starting clean scripts..."
-for f in ${scripts[@]}; do
-  print_info "Running:" $f
-  ./$f
-done;
-print_ok "Done"
+  mapfile -t data < <(find $algos_folder -name "data.csv")
+  for f in ${data[@]}; do
+    rm $f
+  done;
 
-mapfile -t data < <(find $algos -name "data.csv")
+  rm $outfile
+  print_ok "Done"
+}
 
-print_info "Removing created files..."
-for f in ${data[@]}; do
-  rm $f
-done;
+run_clean_scripts() {
+  local scripts=$(get_scripts "clean")
 
-rm $outfile
-print_ok "Done"
+  run_scripts $scripts "clean"
+}
+
+run_clean_scripts 
+remove_files 

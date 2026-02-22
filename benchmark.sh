@@ -27,9 +27,9 @@ benchmark.sh_usage() {
   # :command.usage_commands
   printf "%s\n" "$(bold "Commands:")"
   printf "  %s   Compiles and builds all scripts\n" "$(green "build")"
-  printf "  %s   Deletes all build files\n" "$(green "clean")"
-  printf "  %s   Runs all scripts\n" "$(green "run")  "
-  printf "  %s   Plots all data collected with Run command\n" "$(green "plot") "
+  printf "  %s   Deletes all build- and program made files\n" "$(green "clean")"
+  printf "  %s   Runs all sorting algorithms\n" "$(green "run")  "
+  printf "  %s   Plots all data collected with run command\n" "$(green "plot") "
   echo
 
   # :command.long_usage
@@ -72,10 +72,10 @@ benchmark.sh_build_usage() {
 
 # :command.usage
 benchmark.sh_clean_usage() {
-  printf "benchmark.sh clean - Deletes all build files\n\n"
+  printf "benchmark.sh clean - Deletes all build- and program made files\n\n"
 
   printf "%s\n" "$(bold "Usage:")"
-  printf "  benchmark.sh clean\n"
+  printf "  benchmark.sh clean [OPTIONS]\n"
   printf "  benchmark.sh clean --help | -h\n"
   echo
 
@@ -83,6 +83,17 @@ benchmark.sh_clean_usage() {
   if [[ -n "$long_usage" ]]; then
     # :command.usage_options
     printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_flags
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--lang LANG")"
+    printf "    Name of coding languaes [LANG1,LANG2,...]\n"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--algo ALGO")"
+    printf "    Name of sorting algorithms [SORT1,SORT2,...]\n"
+    echo
 
     # :command.usage_fixed_flags
     printf "  %s\n" "$(magenta "--help, -h")"
@@ -94,7 +105,7 @@ benchmark.sh_clean_usage() {
 
 # :command.usage
 benchmark.sh_run_usage() {
-  printf "benchmark.sh run - Runs all scripts\n\n"
+  printf "benchmark.sh run - Runs all sorting algorithms\n\n"
 
   printf "%s\n" "$(bold "Usage:")"
   printf "  benchmark.sh run [OPTIONS]\n"
@@ -132,6 +143,16 @@ benchmark.sh_run_usage() {
     printf "\n"
     echo
 
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--algo ALGO")"
+    printf "    Name of sorting algorithms [SORT1,SORT2,...]\n"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--lang LANG")"
+    printf "    Name of coding languaes [LANG1,LANG2,...]\n"
+    echo
+
     # :command.usage_fixed_flags
     printf "  %s\n" "$(magenta "--help, -h")"
     printf "    Show this help\n"
@@ -142,7 +163,7 @@ benchmark.sh_run_usage() {
 
 # :command.usage
 benchmark.sh_plot_usage() {
-  printf "benchmark.sh plot - Plots all data collected with Run command\n\n"
+  printf "benchmark.sh plot - Plots all data collected with run command\n\n"
 
   printf "%s\n" "$(bold "Usage:")"
   printf "  benchmark.sh plot\n"
@@ -292,10 +313,35 @@ print_err() {
   echo "$(red [!])" "$@"
 }
 
+run_scripts() {
+  if [[ $# -ne 2 ]]; then
+    return 0
+  fi
+
+  local scripts="$1"
+  local name="$2"
+
+  print_info "Starting" $name "scripts..."
+  for f in ${scripts[@]}; do
+    print_info "Running:" $f
+    ./$f
+  done;
+  print_ok "Done"
+}
+
+get_scripts() {
+  local type="$1"
+  local algo="${args[--algo]//,/|}"
+  local lang="${args[--lang]//,/|}"
+
+  find $algos_folder -name "$type.sh" | grep -E "$algo" | grep -E "$lang"
+
+}
+
 # src/lib/variables.sh
 # ----- Folders ----- #
 plot_folder="./plotting"
-algos="algorithms/"
+algos_folder="algorithms/"
 
 # ----- Files ----- #
 plot_script="$plot_folder/plot.gp"
@@ -306,14 +352,10 @@ outfile="$plot_folder/graph.png"
 benchmark.sh_build_command() {
 
   # src/commands/build.sh
-  mapfile -t scripts < <(find $algos -name "build.sh")
+  mapfile -t scripts < <(find $algos_folder -name "build.sh")
 
-  print_info "Starting build scripts..."
-  for f in ${scripts[@]}; do
-    print_info "Running:" $f
-    ./$f
-  done;
-  print_ok "Done"
+  get_scripts
+  run_scripts $scripts "build"
 
 }
 
@@ -321,24 +363,29 @@ benchmark.sh_build_command() {
 benchmark.sh_clean_command() {
 
   # src/commands/clean.sh
-  mapfile -t scripts < <(find $algos -name "clean.sh")
+  remove_files() {
+    local -a data
 
-  print_info "Starting clean scripts..."
-  for f in ${scripts[@]}; do
-    print_info "Running:" $f
-    ./$f
-  done;
-  print_ok "Done"
+    print_info "Removing created files..."
 
-  mapfile -t data < <(find $algos -name "data.csv")
+    mapfile -t data < <(find $algos_folder -name "data.csv")
+    for f in ${data[@]}; do
+      rm $f
+    done;
 
-  print_info "Removing created files..."
-  for f in ${data[@]}; do
-    rm $f
-  done;
+    rm $outfile
+    print_ok "Done"
+  }
 
-  rm $outfile
-  print_ok "Done"
+  run_clean_scripts() {
+    local scripts=$(get_scripts "clean")
+
+    run_scripts $scripts "clean"
+  }
+
+  run_clean_scripts
+
+  remove_files
 
 }
 
@@ -346,7 +393,7 @@ benchmark.sh_clean_command() {
 benchmark.sh_run_command() {
 
   # src/commands/run.sh
-  mapfile -t scripts < <(find $algos -name "run.sh")
+  mapfile -t scripts < <(find $algos_folder -name "run.sh")
 
   tmp=("${args[--lower]}" "${args[--upper]}" "${args[--step]}" "${args[--iter]}")
 
@@ -369,12 +416,12 @@ benchmark.sh_plot_command() {
   # src/commands/plot.sh
   names=()
 
-  mapfile -t files < <(find $algos -name "*.csv")
+  mapfile -t files < <(find $algos_folder -name "*.csv")
 
   # make filepath into proper name
   for f in "${files[@]}"; do
     # strip algo folder, remove slashes and add to names
-    names+=("$(dirname ${f#"$algos"} | sed 's/\//-/')")
+    names+=("$(dirname ${f#"$algos_folder"} | sed 's/\//-/')")
   done
 
   files_str="${files[*]}"
@@ -555,6 +602,33 @@ benchmark.sh_clean_parse_requirements() {
   while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
+      # :flag.case
+      --lang)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--lang']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--lang requires an argument: --lang LANG" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --algo)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--algo']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--algo requires an argument: --algo ALGO" >&2
+          exit 1
+        fi
+        ;;
 
       -?*)
         printf "invalid option: %s\n" "$key" >&2
@@ -672,6 +746,34 @@ benchmark.sh_run_parse_requirements() {
         fi
         ;;
 
+      # :flag.case
+      --algo)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--algo']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--algo requires an argument: --algo ALGO" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --lang)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--lang']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--lang requires an argument: --lang LANG" >&2
+          exit 1
+        fi
+        ;;
+
       -?*)
         printf "invalid option: %s\n" "$key" >&2
         exit 1
@@ -757,7 +859,7 @@ benchmark.sh_plot_parse_requirements() {
 
 # :command.initialize
 initialize() {
-  declare -g version="0.1.0"
+  declare -g version="0.2.0"
   set -e
 
 }

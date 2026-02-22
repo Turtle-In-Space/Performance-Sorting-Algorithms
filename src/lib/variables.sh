@@ -1,6 +1,6 @@
 # ----- Folders ----- #
 plot_folder="./plotting"
-algos="algorithms/"
+algos_folder="algorithms/"
 
 # ----- Files ----- #
 plot_script="$plot_folder/plot.gp"
