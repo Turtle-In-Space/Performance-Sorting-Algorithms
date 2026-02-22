@@ -5,17 +5,17 @@ remove_files() {
 
   mapfile -t data < <(find $algos_folder -name "data.csv")
   for f in ${data[@]}; do
-    rm $f
+    rm -f $f
   done;
 
-  rm $outfile
+  rm -f $outfile
   print_ok "Done"
 }
 
 run_clean_scripts() {
   local scripts=$(get_scripts "clean")
 
-  run_scripts $scripts "clean"
+  run_scripts scripts "clean"
 }
 
 run_clean_scripts 

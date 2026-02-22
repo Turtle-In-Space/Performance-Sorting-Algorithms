@@ -1,4 +1,2 @@
-mapfile -t scripts < <(find $algos_folder -name "build.sh")
-
-get_scripts
-run_scripts $scripts "build"
+local scripts=$(get_scripts "build")
+run_scripts scripts "build" 

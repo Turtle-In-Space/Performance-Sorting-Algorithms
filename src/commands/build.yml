@@ -2,8 +2,8 @@
 name: build
 help: Compiles and builds all scripts
 
-args:
-
 flags:
+  - import: src/flags/lang.yml
+  - import: src/flags/algo.yml
 
 examples:

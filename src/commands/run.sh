@@ -1,14 +1,12 @@
-mapfile -t scripts < <(find $algos_folder -name "run.sh")
+local -a tmp=(
+  "${args[--lower]}"
+  "${args[--upper]}"
+  "${args[--step]}"
+  "${args[--iter]}"
+)
 
-tmp=("${args[--lower]}" "${args[--upper]}" "${args[--step]}" "${args[--iter]}")
+[[ -n "${args[--out]}" ]] && tmp+=("${args[--out]}")
 
-[ -n "${args[--out]}" ] && tmp+=("${args[--out]}")
-
-print_info "Starting run scripts..."
-
-for f in ${scripts[@]}; do
-  print_info "Running:" $f
-  ./$f ${tmp[@]}
-done;
-
-print_ok "Done"
+local -a scripts
+mapfile -t scripts < <(get_scripts "run")
+run_scripts_with_params scripts "run" tmp
