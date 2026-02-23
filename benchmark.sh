@@ -226,7 +226,7 @@ benchmark.sh_plot_usage() {
 benchmark.sh_completions_usage() {
   if [[ -n $long_usage ]]; then
     printf "benchmark.sh completions\n\n"
-    printf "  Generate bash completions\n  Usage: eval \"\$(cli completions)\"\n\n"
+    printf "  Generate bash completions\n  Usage: eval \"\$(benchmark completions)\"\n\n"
   else
     printf "benchmark.sh completions - Generate bash completions\n\n"
   fi

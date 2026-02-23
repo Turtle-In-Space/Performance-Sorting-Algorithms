@@ -29,6 +29,4 @@ commands:
   - name: completions
     help: |-
       Generate bash completions
-      Usage: eval "\$(cli completions)"
-
-examples:
+      Usage: eval "\$(benchmark completions)"
