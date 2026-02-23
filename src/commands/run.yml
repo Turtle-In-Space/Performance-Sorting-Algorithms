@@ -6,28 +6,35 @@ flags:
   - long: --lower
     short: -l
     arg: lower
-    required: yes
+    default: "1000"
+    help: lower bound of n for array length
 
   - long: --upper
     short: -u
     arg: upper
-    required: yes
+    default: "10000"
+    help: upper bound of n for array length
 
   - long: --step
     short: -s
     arg: step
-    required: yes
+    default: "500"
+    help: size of steps for n to use
 
   - long: --iter
     short: -i
     arg: iter
-    required: yes
+    default: "25"
+    help: number of times each size of n will be tested
 
   - long: --out
     short: -o
     arg: out
+    help: a csv file to store timings in
 
   - import: src/flags/algo.yml
   - import: src/flags/lang.yml
 
 examples:
+  - benchmark run --lang java
+  - benchmark run -l 10 -u 20 -s 1 -i 5 -o data.csv

@@ -131,28 +131,32 @@ benchmark.sh_run_usage() {
 
     # :command.usage_flags
     # :flag.usage
-    printf "  %s\n" "$(magenta "--lower, -l LOWER (required)")"
-    printf "\n"
+    printf "  %s\n" "$(magenta "--lower, -l LOWER")"
+    printf "    lower bound of n for array length\n"
+    printf "    %s\n" "Default: 1000"
     echo
 
     # :flag.usage
-    printf "  %s\n" "$(magenta "--upper, -u UPPER (required)")"
-    printf "\n"
+    printf "  %s\n" "$(magenta "--upper, -u UPPER")"
+    printf "    upper bound of n for array length\n"
+    printf "    %s\n" "Default: 10000"
     echo
 
     # :flag.usage
-    printf "  %s\n" "$(magenta "--step, -s STEP (required)")"
-    printf "\n"
+    printf "  %s\n" "$(magenta "--step, -s STEP")"
+    printf "    size of steps for n to use\n"
+    printf "    %s\n" "Default: 500"
     echo
 
     # :flag.usage
-    printf "  %s\n" "$(magenta "--iter, -i ITER (required)")"
-    printf "\n"
+    printf "  %s\n" "$(magenta "--iter, -i ITER")"
+    printf "    number of times each size of n will be tested\n"
+    printf "    %s\n" "Default: 25"
     echo
 
     # :flag.usage
     printf "  %s\n" "$(magenta "--out, -o OUT")"
-    printf "\n"
+    printf "    a csv file to store timings in\n"
     echo
 
     # :flag.usage
@@ -168,6 +172,12 @@ benchmark.sh_run_usage() {
     # :command.usage_fixed_flags
     printf "  %s\n" "$(magenta "--help, -h")"
     printf "    Show this help\n"
+    echo
+
+    # :command.usage_examples
+    printf "%s\n" "$(bold "Examples:")"
+    printf "  benchmark run --lang java\n"
+    printf "  benchmark run -l 10 -u 20 -s 1 -i 5 -o data.csv\n"
     echo
 
   fi
@@ -953,23 +963,11 @@ benchmark.sh_run_parse_requirements() {
     esac
   done
 
-  # :command.required_flags_filter
-  if [[ -z ${args['--lower']+x} ]]; then
-    printf "missing required flag: --lower, -l LOWER\n" >&2
-    exit 1
-  fi
-  if [[ -z ${args['--upper']+x} ]]; then
-    printf "missing required flag: --upper, -u UPPER\n" >&2
-    exit 1
-  fi
-  if [[ -z ${args['--step']+x} ]]; then
-    printf "missing required flag: --step, -s STEP\n" >&2
-    exit 1
-  fi
-  if [[ -z ${args['--iter']+x} ]]; then
-    printf "missing required flag: --iter, -i ITER\n" >&2
-    exit 1
-  fi
+  # :command.default_assignments
+  [[ -n ${args['--lower']:-} ]] || args['--lower']="1000"
+  [[ -n ${args['--upper']:-} ]] || args['--upper']="10000"
+  [[ -n ${args['--step']:-} ]] || args['--step']="500"
+  [[ -n ${args['--iter']:-} ]] || args['--iter']="25"
 
 }
 

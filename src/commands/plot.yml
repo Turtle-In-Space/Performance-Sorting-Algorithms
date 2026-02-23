@@ -2,8 +2,4 @@
 name: plot
 help: Plots all data collected with run command
 
-args:
-
-flags:
-
 examples:
