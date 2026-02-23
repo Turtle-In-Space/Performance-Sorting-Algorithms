@@ -7,3 +7,5 @@ flags:
   - import: src/flags/algo.yml
 
 examples:
+  - benchmark build 
+  - benchmark build --lang java

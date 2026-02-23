@@ -79,6 +79,12 @@ benchmark.sh_build_usage() {
     printf "    Show this help\n"
     echo
 
+    # :command.usage_examples
+    printf "%s\n" "$(bold "Examples:")"
+    printf "  benchmark build\n"
+    printf "  benchmark build --lang java\n"
+    echo
+
   fi
 }
 
@@ -110,6 +116,12 @@ benchmark.sh_clean_usage() {
     # :command.usage_fixed_flags
     printf "  %s\n" "$(magenta "--help, -h")"
     printf "    Show this help\n"
+    echo
+
+    # :command.usage_examples
+    printf "%s\n" "$(bold "Examples:")"
+    printf "  benchmark clean\n"
+    printf "  benchmark clean --lang java\n"
     echo
 
   fi
@@ -200,6 +212,11 @@ benchmark.sh_plot_usage() {
     # :command.usage_fixed_flags
     printf "  %s\n" "$(magenta "--help, -h")"
     printf "    Show this help\n"
+    echo
+
+    # :command.usage_examples
+    printf "%s\n" "$(bold "Examples:")"
+    printf "  benchmark plot\n"
     echo
 
   fi
@@ -453,6 +470,10 @@ send_completions() {
   echo $'  local compline="${compwords[*]}"'
   echo $''
   echo $'  case "$compline" in'
+  echo $'    \'completions\'*)'
+  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--help -h")" -- "$cur")'
+  echo $'      ;;'
+  echo $''
   echo $'    \'build\'*)'
   echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--algo --help --lang -h")" -- "$cur")'
   echo $'      ;;'
@@ -470,7 +491,7 @@ send_completions() {
   echo $'      ;;'
   echo $''
   echo $'    *)'
-  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--help --version -h -v build clean plot run")" -- "$cur")'
+  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--help --version -h -v build clean completions plot run")" -- "$cur")'
   echo $'      ;;'
   echo $''
   echo $'  esac'
