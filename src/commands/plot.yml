@@ -2,5 +2,12 @@
 name: plot
 help: Plots all data collected with run command
 
+flags:
+  - long: --logscale
+    short: -l
+    arg: logscale
+    help: which axis to apply logscale to
+    allowed: [x, y, xy]
+
 examples:
   - benchmark plot

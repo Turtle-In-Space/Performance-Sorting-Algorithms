@@ -10,5 +10,6 @@ done
 
 files_str="${files[*]}"
 names_str="${names[*]}"
+axis=${args[--logscale]}
 
-gnuplot -e "files='$files_str'; names='$names_str'; out='$outfile'" $plot_script
+gnuplot -e "axis='$axis'; files='$files_str'; names='$names_str'; out='$outfile'" $plot_script

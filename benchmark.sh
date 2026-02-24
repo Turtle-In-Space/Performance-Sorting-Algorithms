@@ -200,7 +200,7 @@ benchmark.sh_plot_usage() {
   printf "benchmark.sh plot - Plots all data collected with run command\n\n"
 
   printf "%s\n" "$(bold "Usage:")"
-  printf "  benchmark.sh plot\n"
+  printf "  benchmark.sh plot [OPTIONS]\n"
   printf "  benchmark.sh plot --help | -h\n"
   echo
 
@@ -208,6 +208,13 @@ benchmark.sh_plot_usage() {
   if [[ -n "$long_usage" ]]; then
     # :command.usage_options
     printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_flags
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--logscale, -l LOGSCALE")"
+    printf "    which axis to apply logscale to\n"
+    printf "    %s\n" "Allowed: x, y, xy"
+    echo
 
     # :command.usage_fixed_flags
     printf "  %s\n" "$(magenta "--help, -h")"
@@ -406,16 +413,8 @@ run_scripts_with_params() {
 
 get_scripts() {
   local type="$1"
-  local algo="${args[--algo]//,/|}"
-  local lang="${args[--lang]//,/|}"
-
-  if [[ -n $algo ]]; then
-    algo="/$algo"
-  fi
-
-  if [[ -n $lang ]]; then
-    lang="/$lang"
-  fi
+  local algo="/${args[--algo]//,/|/}"
+  local lang="/${args[--lang]//,/|/}"
 
   find $algos_folder -name "$type.sh" | grep -E "$algo" | grep -E "$lang"
 
@@ -470,8 +469,16 @@ send_completions() {
   echo $'  local compline="${compwords[*]}"'
   echo $''
   echo $'  case "$compline" in'
+  echo $'    \'plot\'*\'--logscale\')'
+  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "x y xy")" -- "$cur")'
+  echo $'      ;;'
+  echo $''
   echo $'    \'completions\'*)'
   echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--help -h")" -- "$cur")'
+  echo $'      ;;'
+  echo $''
+  echo $'    \'plot\'*\'-l\')'
+  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "x y xy")" -- "$cur")'
   echo $'      ;;'
   echo $''
   echo $'    \'build\'*)'
@@ -483,7 +490,7 @@ send_completions() {
   echo $'      ;;'
   echo $''
   echo $'    \'plot\'*)'
-  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--help -h")" -- "$cur")'
+  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--help --logscale -h -l")" -- "$cur")'
   echo $'      ;;'
   echo $''
   echo $'    \'run\'*)'
@@ -578,8 +585,9 @@ benchmark.sh_plot_command() {
 
   files_str="${files[*]}"
   names_str="${names[*]}"
+  axis=${args[--logscale]}
 
-  gnuplot -e "files='$files_str'; names='$names_str'; out='$outfile'" $plot_script
+  gnuplot -e "axis='$axis'; files='$files_str'; names='$names_str'; out='$outfile'" $plot_script
 
 }
 
@@ -1020,6 +1028,19 @@ benchmark.sh_plot_parse_requirements() {
   while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
+      # :flag.case
+      --logscale | -l)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--logscale']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--logscale requires an argument: --logscale, -l LOGSCALE" >&2
+          exit 1
+        fi
+        ;;
 
       -?*)
         printf "invalid option: %s\n" "$key" >&2
@@ -1036,6 +1057,12 @@ benchmark.sh_plot_parse_requirements() {
 
     esac
   done
+
+  # :command.whitelist_filter
+  if [[ ${args['--logscale']:-} ]] && [[ ! ${args['--logscale']:-} =~ ^(x|y|xy)$ ]]; then
+    printf "%s\n" "--logscale must be one of: x, y, xy" >&2
+    exit 1
+  fi
 
 }
 
