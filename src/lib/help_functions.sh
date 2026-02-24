@@ -41,16 +41,8 @@ run_scripts_with_params() {
 
 get_scripts() {
   local type="$1"
-  local algo="${args[--algo]//,/|}"
-  local lang="${args[--lang]//,/|}"
-
-  if [[ -n $algo ]]; then
-    algo="/$algo"
-  fi
-
-  if [[ -n $lang ]]; then
-    lang="/$lang"
-  fi
+  local algo="/${args[--algo]//,/|/}"
+  local lang="/${args[--lang]//,/|/}"
 
   find $algos_folder -name "$type.sh" | grep -E "$algo" | grep -E "$lang" 
 }
