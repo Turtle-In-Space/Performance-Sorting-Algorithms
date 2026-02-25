@@ -370,47 +370,6 @@ black_underlined() { print_in_color "\e[4;30m" "$*"; }
 white_underlined() { print_in_color "\e[4;37m" "$*"; }
 
 # src/lib/help_functions.sh
-run_scripts() {
-  local -n scripts_ref="$1"
-  local name="$2"
-
-  if ((${#scripts_ref[@]} == 0)); then
-    print_warn "No scripts found!"
-    return 0
-  fi
-
-  print_info "Starting" "$name" "scripts..."
-
-  for f in "${scripts_ref[@]}"; do
-    print_info "Running:" "$f"
-
-    ./$f
-  done
-
-  print_ok "Done"
-}
-
-run_scripts_with_params() {
-  local -n scripts_ref="$1"
-  local name="$2"
-  local -n script_args_ref="$3"
-
-  if (( ${#scripts_ref[@]} == 0 )); then
-    print_warn "No scripts found!"
-  return 0
-  fi
-
-  print_info "Starting" "$name" "scripts..."
-
-  for f in "${scripts_ref[@]}"; do
-    print_info "Running:" "$f"
-
-    ./$f ${script_args_ref[@]}
-  done
-
-  print_ok "Done"
-}
-
 get_program_folders() {
   local -a algos langs
   local -a results=()
@@ -680,12 +639,12 @@ benchmark.sh_plot_command() {
   # src/commands/plot.sh
   names=()
 
-  mapfile -t files < <(find $algos_folder/ -name "*.csv")
+  mapfile -t files < <(find $algos_folder -name "*.csv")
 
   # make filepath into proper name
   for f in "${files[@]}"; do
     # strip algo folder, remove slashes and add to names
-    names+=("$(dirname ${f#"$algos_folder/"} | sed 's/\//-/')")
+    names+=("$(dirname ${f#"$algos_folder"} | sed 's/\//-/')")
   done
 
   files_str="${files[*]}"
