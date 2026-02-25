@@ -1,0 +1,18 @@
+[
+  {
+    "file": "sort.cpp",
+    "arguments": [
+      "g++",
+      "-std=c++20",
+      "-g",
+      "-Werror",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-Wmissing-declarations",
+      "-c",
+      "sort.cpp"
+    ],
+    "directory": "/home/elias/Projects/Performance-Sorting-Algorithms/algorithms/built-in/cpp"
+  }
+]
