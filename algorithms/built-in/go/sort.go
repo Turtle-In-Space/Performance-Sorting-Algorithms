@@ -40,14 +40,14 @@ func createArray(n int) []int {
 }
 
 func timeSort(data []int, iter int) int64 {
-	var tmp []int
+	tmp := make([]int, len(data))
 	copy(tmp, data)
 
 	start := time.Now()
 
 	for range iter {
-		slices.Sort(data)
 		copy(data, tmp)
+		slices.Sort(data)
 	}
 
 	return time.Since(start).Nanoseconds()
@@ -107,6 +107,7 @@ func main() {
 	for n := *optLower; n <= *optUpper; n += *optStep {
 		data := createArray(n)
 		elapsed := timeSort(data, *optIter)
+		elapsed = elapsed / int64(*optIter)
 		out := formatTime(elapsed, n)
 		writeTime(out)
 	}

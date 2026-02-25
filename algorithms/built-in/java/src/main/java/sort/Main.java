@@ -71,8 +71,8 @@ public class Main {
         int[] tmp = data.clone();
 
         for (int i = 0; i < iter; i++) {
+            System.arraycopy(tmp, 0, data, 0, data.length);
             Arrays.sort(data);
-            data = tmp.clone();
         }
 
         return System.nanoTime() - start;
@@ -91,7 +91,7 @@ public class Main {
 
     private static void writeTime(StringBuilder out, Boolean isOutfile, String outfile) {
         if (!isOutfile) {
-            System.out.println(out);
+            System.out.print(out);
             return;
         }
 

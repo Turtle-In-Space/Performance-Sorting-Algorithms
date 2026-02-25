@@ -43,12 +43,15 @@ def setup_args() -> argparse.ArgumentParser:
 if __name__ == "__main__":
     parser = setup_args()
     args = parser.parse_args()
+
+    if args.out != None:
+        open(args.out, "w")
     
-    for n in range(args.lower, args.upper, args.step):
+    for n in range(args.lower, args.upper + 1, args.step):
         data = create_array(n) 
         elapsed = time_sort(data, args.iter)
 
         if args.out != None:
             write_time(elapsed/args.iter, n, args.out)
         else:
-            print(elapsed/args.iter, "ns", n)
+            print(f"{n}:\t{elapsed/args.iter}")

@@ -1,4 +1,4 @@
-module Algorithms/built-in-sort
+module built-in/sort
 
 go 1.25.0
 
