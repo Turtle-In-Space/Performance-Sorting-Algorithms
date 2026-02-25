@@ -11,9 +11,9 @@ x_mandoc_footer: |-
 variables:
   # ----- Folders ----- #
   - name: plot_folder
-    value: plotting/
+    value: plotting
   - name: algos_folder
-    value: algorithms/
+    value: algorithms
   # ----- Files ----- #
   - name: plot_script
     value: $plot_folder/plot.gp

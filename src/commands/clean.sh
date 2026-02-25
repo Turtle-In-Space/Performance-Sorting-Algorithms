@@ -12,12 +12,38 @@ remove_files() {
   print_ok "Done"
 }
 
-run_clean_scripts() {
-  local -a scripts
-  mapfile -t scripts < <(get_scripts "clean")
+clean() {
+  local dir="$1"
+  local cmd="$2"
 
-  run_scripts scripts "clean"
+  print_info "Cleaning: " $dir
+  if ! eval $cmd; then
+    print_warn "Cleaning failed for $dir"
+  fi
 }
 
-run_clean_scripts 
+exec_clean() {
+  programs=$(get_program_folders)
+
+  for dir in $programs; do
+    case $(basename $dir) in 
+      java)
+        clean $dir "mvn clean -q -f $dir"
+      ;;
+      go)
+        clean $dir "go clean -C $dir"
+      ;;
+      python)
+      ;;
+      c | cpp)
+        clean $dir "make clean -q -C $dir"
+      ;;
+      *)
+        print_err "uh-oh"
+      ;;
+    esac
+  done;
+}
+
+exec_clean
 remove_files 

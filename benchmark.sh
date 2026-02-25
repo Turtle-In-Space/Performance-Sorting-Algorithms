@@ -397,7 +397,7 @@ run_scripts_with_params() {
 
   if (( ${#scripts_ref[@]} == 0 )); then
     print_warn "No scripts found!"
-    return 0
+  return 0
   fi
 
   print_info "Starting" "$name" "scripts..."
@@ -411,13 +411,27 @@ run_scripts_with_params() {
   print_ok "Done"
 }
 
-get_scripts() {
-  local type="$1"
-  local algo="/${args[--algo]//,/|/}"
-  local lang="/${args[--lang]//,/|/}"
+get_program_folders() {
+  local -a algos langs
+  local -a results=()
 
-  find $algos_folder -name "$type.sh" | grep -E "$algo" | grep -E "$lang"
+  # split comma lists into arrays
+  IFS=',' read -ra algos <<< "${args[--algo]:-}"
+  IFS=',' read -ra langs <<< "${args[--lang]:-}"
 
+  # if empty, match all
+  ((${#algos[@]})) || algos=("*")
+  ((${#langs[@]})) || langs=("*")
+
+  for a in "${algos[@]}"; do
+    for l in "${langs[@]}"; do
+      for d in "$algos_folder"/$a/$l; do
+        [[ -d $d ]] && results+=("$d")
+      done
+    done
+  done
+
+  printf '%s\n' "${results[@]}"
 }
 
 # src/lib/out_message.sh
@@ -513,9 +527,41 @@ send_completions() {
 benchmark.sh_build_command() {
 
   # src/commands/build.sh
-  local -a scripts
-  mapfile -t scripts < <(get_scripts "build")
-  run_scripts scripts "build"
+  build() {
+    local dir="$1"
+    local cmd="$2"
+
+    print_info "Building: " $dir
+    if ! eval $cmd; then
+      print_warn "Build failed for $dir"
+    fi
+  }
+
+  exec_build() {
+    programs=$(get_program_folders)
+
+    for dir in $programs; do
+      case $(basename $dir) in
+
+        java)
+          build $dir "mvn package -q -f $dir"
+        ;;
+        go)
+          build $dir "go build -C $dir"
+        ;;
+        python)
+        ;;
+        c | cpp)
+          build $dir "make -q -C $dir"
+        ;;
+        *)
+          print_err "uh-oh"
+        ;;
+      esac
+    done;
+  }
+
+  exec_build
 
 }
 
@@ -537,15 +583,41 @@ benchmark.sh_clean_command() {
     print_ok "Done"
   }
 
-  run_clean_scripts() {
-    local -a scripts
-    mapfile -t scripts < <(get_scripts "clean")
+  clean() {
+    local dir="$1"
+    local cmd="$2"
 
-    run_scripts scripts "clean"
+    print_info "Cleaning: " $dir
+    if ! eval $cmd; then
+      print_warn "Cleaning failed for $dir"
+    fi
   }
 
-  run_clean_scripts
+  exec_clean() {
+    programs=$(get_program_folders)
 
+    for dir in $programs; do
+      case $(basename $dir) in
+
+        java)
+          clean $dir "mvn clean -q -f $dir"
+        ;;
+        go)
+          clean $dir "go clean -C $dir"
+        ;;
+        python)
+        ;;
+        c | cpp)
+          clean $dir "make clean -q -C $dir"
+        ;;
+        *)
+          print_err "uh-oh"
+        ;;
+      esac
+    done;
+  }
+
+  exec_clean
   remove_files
 
 }
@@ -554,18 +626,51 @@ benchmark.sh_clean_command() {
 benchmark.sh_run_command() {
 
   # src/commands/run.sh
-  local -a tmp=(
-    "${args[--lower]}"
-    "${args[--upper]}"
-    "${args[--step]}"
-    "${args[--iter]}"
-  )
+  run() {
+    local dir="$1"
+    shift
+    local run_args="$@"
+    [[ -n "${args[--out]}" ]] && run_args+=" -o $dir/${args[--out]}"
 
-  [[ -n "${args[--out]}" ]] && tmp+=("${args[--out]}")
+    print_info "Running: " $dir
 
-  local -a scripts
-  mapfile -t scripts < <(get_scripts "run")
-  run_scripts_with_params scripts "run" tmp
+    if ! eval $run_args; then
+      print_warn "Running failed for $dir"
+    fi
+  }
+
+  exec_run() {
+    programs=$(get_program_folders)
+    local -a tmp=(
+      "-l ${args[--lower]}"
+      "-u ${args[--upper]}"
+      "-s ${args[--step]}"
+      "-i ${args[--iter]}"
+    )
+
+    for dir in $programs; do
+      case $(basename $dir) in
+
+        java)
+          run $dir "java -jar $dir/target/sort.jar ${tmp[@]}"
+        ;;
+        go)
+          run $dir "./$dir/sort ${tmp[@]}"
+        ;;
+        python)
+          run $dir "python3 $dir/sort.py ${tmp[@]}"
+        ;;
+        c | cpp)
+          run $dir "./$dir/sort ${tmp[@]}"
+        ;;
+        *)
+          print_err "uh-oh"
+        ;;
+      esac
+    done;
+  }
+
+  exec_run
 
 }
 
@@ -575,12 +680,12 @@ benchmark.sh_plot_command() {
   # src/commands/plot.sh
   names=()
 
-  mapfile -t files < <(find $algos_folder -name "*.csv")
+  mapfile -t files < <(find $algos_folder/ -name "*.csv")
 
   # make filepath into proper name
   for f in "${files[@]}"; do
     # strip algo folder, remove slashes and add to names
-    names+=("$(dirname ${f#"$algos_folder"} | sed 's/\//-/')")
+    names+=("$(dirname ${f#"$algos_folder/"} | sed 's/\//-/')")
   done
 
   files_str="${files[*]}"
@@ -1120,10 +1225,10 @@ initialize() {
 
   # :command.variables
   # :variable.definition
-  declare -g plot_folder="plotting/"
+  declare -g plot_folder="plotting"
 
   # :variable.definition
-  declare -g algos_folder="algorithms/"
+  declare -g algos_folder="algorithms"
 
   # :variable.definition
   declare -g plot_script="$plot_folder/plot.gp"
