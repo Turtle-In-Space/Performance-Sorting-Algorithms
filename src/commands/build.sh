@@ -22,10 +22,7 @@ exec_build() {
       python)
       ;;
       c | cpp)
-        build $dir "make -q -C $dir"
-      ;;
-      *)
-        print_err "uh-oh"
+        build $dir "make -s -C $dir"
       ;;
     esac
   done;

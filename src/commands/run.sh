@@ -33,9 +33,6 @@ exec_run() {
       c | cpp)
         run $dir "./$dir/sort ${tmp[@]}"
       ;;
-      *)
-        print_err "uh-oh"
-      ;;
     esac
   done;
 }

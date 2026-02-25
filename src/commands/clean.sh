@@ -36,10 +36,7 @@ exec_clean() {
       python)
       ;;
       c | cpp)
-        clean $dir "make clean -q -C $dir"
-      ;;
-      *)
-        print_err "uh-oh"
+        clean $dir "make clean -s -C $dir"
       ;;
     esac
   done;

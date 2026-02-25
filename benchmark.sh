@@ -511,10 +511,7 @@ benchmark.sh_build_command() {
         python)
         ;;
         c | cpp)
-          build $dir "make -q -C $dir"
-        ;;
-        *)
-          print_err "uh-oh"
+          build $dir "make -s -C $dir"
         ;;
       esac
     done;
@@ -567,10 +564,7 @@ benchmark.sh_clean_command() {
         python)
         ;;
         c | cpp)
-          clean $dir "make clean -q -C $dir"
-        ;;
-        *)
-          print_err "uh-oh"
+          clean $dir "make clean -s -C $dir"
         ;;
       esac
     done;
@@ -621,9 +615,6 @@ benchmark.sh_run_command() {
         ;;
         c | cpp)
           run $dir "./$dir/sort ${tmp[@]}"
-        ;;
-        *)
-          print_err "uh-oh"
         ;;
       esac
     done;
