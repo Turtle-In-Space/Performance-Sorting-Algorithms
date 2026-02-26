@@ -1,0 +1,4 @@
+benchmark.sh_clean_command
+benchmark.sh_build_command
+benchmark.sh_run_command
+benchmark.sh_plot_command

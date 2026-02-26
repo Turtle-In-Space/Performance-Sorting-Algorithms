@@ -1,0 +1,18 @@
+# ----- All command ----- #
+name: all
+help: Cleans, builds, runs and plots
+
+flags:
+  # ------ Run flags ------ #
+  - import: src/flags/upper.yml
+  - import: src/flags/lower.yml
+  - import: src/flags/step.yml
+  - import: src/flags/iter.yml
+  - import: src/flags/out.yml
+
+  - import: src/flags/lang.yml
+  - import: src/flags/algo.yml
+
+examples:
+  - benchmark all 
+  - benchmark all --lang java
