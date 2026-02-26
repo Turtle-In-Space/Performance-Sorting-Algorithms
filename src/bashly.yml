@@ -25,6 +25,7 @@ commands:
   - import: src/commands/clean.yml
   - import: src/commands/run.yml
   - import: src/commands/plot.yml
+  - import: src/commands/all.yml
 
   - name: completions
     help: |-
