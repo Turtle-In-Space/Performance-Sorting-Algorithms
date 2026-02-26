@@ -30,6 +30,7 @@ benchmark.sh_usage() {
   printf "  %s   Deletes all build- and program made files\n" "$(green "clean")      "
   printf "  %s   Runs all sorting algorithms\n" "$(green "run")        "
   printf "  %s   Plots all data collected with run command\n" "$(green "plot")       "
+  printf "  %s   Cleans, builds, runs and plots\n" "$(green "all")        "
   printf "  %s   Generate bash completions\n" "$(green "completions")"
   echo
 
@@ -143,15 +144,15 @@ benchmark.sh_run_usage() {
 
     # :command.usage_flags
     # :flag.usage
-    printf "  %s\n" "$(magenta "--lower, -l LOWER")"
-    printf "    lower bound of n for array length\n"
-    printf "    %s\n" "Default: 1000"
-    echo
-
-    # :flag.usage
     printf "  %s\n" "$(magenta "--upper, -u UPPER")"
     printf "    upper bound of n for array length\n"
     printf "    %s\n" "Default: 10000"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--lower, -l LOWER")"
+    printf "    lower bound of n for array length\n"
+    printf "    %s\n" "Default: 1000"
     echo
 
     # :flag.usage
@@ -234,6 +235,74 @@ benchmark.sh_plot_usage() {
     # :command.usage_examples
     printf "%s\n" "$(bold "Examples:")"
     printf "  benchmark plot\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+benchmark.sh_all_usage() {
+  printf "benchmark.sh all - Cleans, builds, runs and plots\n\n"
+
+  printf "%s\n" "$(bold "Usage:")"
+  printf "  benchmark.sh all [OPTIONS]\n"
+  printf "  benchmark.sh all --help | -h\n"
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    # :command.usage_options
+    printf "%s\n" "$(bold "Options:")"
+
+    # :command.usage_flags
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--upper, -u UPPER")"
+    printf "    upper bound of n for array length\n"
+    printf "    %s\n" "Default: 10000"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--lower, -l LOWER")"
+    printf "    lower bound of n for array length\n"
+    printf "    %s\n" "Default: 1000"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--step, -s STEP")"
+    printf "    size of steps for n to use\n"
+    printf "    %s\n" "Default: 500"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--iter, -i ITER")"
+    printf "    number of times each size of n will be tested\n"
+    printf "    %s\n" "Default: 25"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--out, -o OUT")"
+    printf "    a csv file to store timings in\n"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--lang LANG")"
+    printf "    Name of coding languaes [LANG1,LANG2,...]\n"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--algo ALGO")"
+    printf "    Name of sorting algorithms [SORT1,SORT2,...]\n"
+    echo
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "$(magenta "--help, -h")"
+    printf "    Show this help\n"
+    echo
+
+    # :command.usage_examples
+    printf "%s\n" "$(bold "Examples:")"
+    printf "  benchmark all\n"
+    printf "  benchmark all --lang java\n"
     echo
 
   fi
@@ -403,6 +472,17 @@ get_program_folders() {
   printf '%s\n' "${results[@]}"
 }
 
+exec_cmd() {
+  local dir="$1"
+  local cmd="$2"
+  local msg="$3"
+
+  print_info "$3: " $dir
+  if ! eval $cmd; then
+    print_warn "$3 failed for $dir"
+  fi
+}
+
 # src/lib/out_message.sh
 print_ok() {
   echo "$(green [+])" "$@"
@@ -480,8 +560,12 @@ send_completions() {
   echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--algo --help --iter --lang --lower --out --step --upper -h -i -l -o -s -u")" -- "$cur")'
   echo $'      ;;'
   echo $''
+  echo $'    \'all\'*)'
+  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--algo --help --iter --lang --lower --out --step --upper -h -i -l -o -s -u")" -- "$cur")'
+  echo $'      ;;'
+  echo $''
   echo $'    *)'
-  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--help --version -h -v build clean completions plot run")" -- "$cur")'
+  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--help --version -h -v all build clean completions plot run")" -- "$cur")'
   echo $'      ;;'
   echo $''
   echo $'  esac'
@@ -496,16 +580,6 @@ send_completions() {
 benchmark.sh_build_command() {
 
   # src/commands/build.sh
-  build() {
-    local dir="$1"
-    local cmd="$2"
-
-    print_info "Building: " $dir
-    if ! eval $cmd; then
-      print_warn "Build failed for $dir"
-    fi
-  }
-
   exec_build() {
     programs=$(get_program_folders)
 
@@ -513,18 +587,20 @@ benchmark.sh_build_command() {
       case $(basename $dir) in
 
         java)
-          build $dir "mvn package -q -f $dir"
+          exec_cmd $dir "mvn package -q -f $dir" "Building"
         ;;
         go)
-          build $dir "go build -C $dir"
+          exec_cmd $dir "go build -C $dir" "Building"
         ;;
         python)
         ;;
         c | cpp)
-          build $dir "make -s -C $dir"
+          exec_cmd $dir "make -s -C $dir" "Building"
         ;;
       esac
     done;
+
+    print_ok "Done"
   }
 
   exec_build
@@ -549,16 +625,6 @@ benchmark.sh_clean_command() {
     print_ok "Done"
   }
 
-  clean() {
-    local dir="$1"
-    local cmd="$2"
-
-    print_info "Cleaning: " $dir
-    if ! eval $cmd; then
-      print_warn "Cleaning failed for $dir"
-    fi
-  }
-
   exec_clean() {
     programs=$(get_program_folders)
 
@@ -566,18 +632,20 @@ benchmark.sh_clean_command() {
       case $(basename $dir) in
 
         java)
-          clean $dir "mvn clean -q -f $dir"
+          exec_cmd $dir "mvn clean -q -f $dir" "Cleaning"
         ;;
         go)
-          clean $dir "go clean -C $dir"
+          exec_cmd $dir "go clean -C $dir" "Cleaning"
         ;;
         python)
         ;;
         c | cpp)
-          clean $dir "make clean -s -C $dir"
+          exec_cmd $dir "make clean -s -C $dir" "Cleaning"
         ;;
       esac
     done;
+
+    print_ok "Done"
   }
 
   exec_clean
@@ -626,8 +694,13 @@ benchmark.sh_run_command() {
         c | cpp)
           run $dir "./$dir/sort ${tmp[@]}"
         ;;
+        *)
+          print_err "uh-oh"
+        ;;
       esac
     done;
+
+    print_ok "Done"
   }
 
   exec_run
@@ -645,19 +718,29 @@ benchmark.sh_plot_command() {
   for dir in $programs; do
     files+=$(find $dir -name "*.csv")
     files+=" "
-  done;
 
-  # make filepath into proper name
-  for f in "${files[@]}"; do
+    # make filepath into proper name
     # strip algo folder, remove slashes and add to names
-    names+=("$(dirname ${f#"$algos_folder"} | sed 's/\//-/')")
-  done
+    names+=$(echo ${dir#"$algos_folder/"} | sed 's/\//-/')
+    names+=" "
+  done;
 
   files_str="${files[*]}"
   names_str="${names[*]}"
   axis=${args[--logscale]}
 
   gnuplot -e "axis='$axis'; files='$files_str'; names='$names_str'; out='$outfile'" $plot_script
+
+}
+
+# :command.function
+benchmark.sh_all_command() {
+
+  # src/commands/all.sh
+  benchmark.sh_clean_command
+  benchmark.sh_build_command
+  benchmark.sh_run_command
+  benchmark.sh_plot_command
 
 }
 
@@ -726,6 +809,13 @@ parse_requirements() {
       action="plot"
       shift
       benchmark.sh_plot_parse_requirements "$@"
+      shift $#
+      ;;
+
+    all)
+      action="all"
+      shift
+      benchmark.sh_all_parse_requirements "$@"
       shift $#
       ;;
 
@@ -949,20 +1039,6 @@ benchmark.sh_run_parse_requirements() {
     key="$1"
     case "$key" in
       # :flag.case
-      --lower | -l)
-
-        # :flag.case_arg
-        if [[ -n ${2+x} ]]; then
-          args['--lower']="$2"
-          shift
-          shift
-        else
-          printf "%s\n" "--lower requires an argument: --lower, -l LOWER" >&2
-          exit 1
-        fi
-        ;;
-
-      # :flag.case
       --upper | -u)
 
         # :flag.case_arg
@@ -972,6 +1048,20 @@ benchmark.sh_run_parse_requirements() {
           shift
         else
           printf "%s\n" "--upper requires an argument: --upper, -u UPPER" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --lower | -l)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--lower']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--lower requires an argument: --lower, -l LOWER" >&2
           exit 1
         fi
         ;;
@@ -1063,8 +1153,8 @@ benchmark.sh_run_parse_requirements() {
   done
 
   # :command.default_assignments
-  [[ -n ${args['--lower']:-} ]] || args['--lower']="1000"
   [[ -n ${args['--upper']:-} ]] || args['--upper']="10000"
+  [[ -n ${args['--lower']:-} ]] || args['--lower']="1000"
   [[ -n ${args['--step']:-} ]] || args['--step']="500"
   [[ -n ${args['--iter']:-} ]] || args['--iter']="25"
 
@@ -1165,6 +1255,156 @@ benchmark.sh_plot_parse_requirements() {
 }
 
 # :command.parse_requirements
+benchmark.sh_all_parse_requirements() {
+  local key
+
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        benchmark.sh_all_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
+
+  # :command.command_filter
+  action="all"
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      # :flag.case
+      --upper | -u)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--upper']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--upper requires an argument: --upper, -u UPPER" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --lower | -l)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--lower']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--lower requires an argument: --lower, -l LOWER" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --step | -s)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--step']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--step requires an argument: --step, -s STEP" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --iter | -i)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--iter']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--iter requires an argument: --iter, -i ITER" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --out | -o)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--out']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--out requires an argument: --out, -o OUT" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --lang)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--lang']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--lang requires an argument: --lang LANG" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --algo)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--algo']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--algo requires an argument: --algo ALGO" >&2
+          exit 1
+        fi
+        ;;
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+  # :command.default_assignments
+  [[ -n ${args['--upper']:-} ]] || args['--upper']="10000"
+  [[ -n ${args['--lower']:-} ]] || args['--lower']="1000"
+  [[ -n ${args['--step']:-} ]] || args['--step']="500"
+  [[ -n ${args['--iter']:-} ]] || args['--iter']="25"
+
+}
+
+# :command.parse_requirements
 benchmark.sh_completions_parse_requirements() {
   local key
 
@@ -1248,6 +1488,7 @@ run() {
     "clean") benchmark.sh_clean_command ;;
     "run") benchmark.sh_run_command ;;
     "plot") benchmark.sh_plot_command ;;
+    "all") benchmark.sh_all_command ;;
     "completions") benchmark.sh_completions_command ;;
   esac
 }
