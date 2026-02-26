@@ -35,6 +35,8 @@ exec_run() {
       ;;
     esac
   done;
+
+  print_ok "Done"
 }
 
 exec_run 

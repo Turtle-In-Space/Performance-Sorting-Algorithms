@@ -3,34 +3,12 @@ name: run
 help: Runs all sorting algorithms
 
 flags:
-  - long: --lower
-    short: -l
-    arg: lower
-    default: "1000"
-    help: lower bound of n for array length
-
-  - long: --upper
-    short: -u
-    arg: upper
-    default: "10000"
-    help: upper bound of n for array length
-
-  - long: --step
-    short: -s
-    arg: step
-    default: "500"
-    help: size of steps for n to use
-
-  - long: --iter
-    short: -i
-    arg: iter
-    default: "25"
-    help: number of times each size of n will be tested
-
-  - long: --out
-    short: -o
-    arg: out
-    help: a csv file to store timings in
+  # ------ Run flags ------ #
+  - import: src/flags/upper.yml
+  - import: src/flags/lower.yml
+  - import: src/flags/step.yml
+  - import: src/flags/iter.yml
+  - import: src/flags/out.yml
 
   - import: src/flags/algo.yml
   - import: src/flags/lang.yml

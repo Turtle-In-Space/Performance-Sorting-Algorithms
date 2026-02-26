@@ -1,0 +1,5 @@
+long: --lower
+short: -l
+arg: lower
+default: "1000"
+help: lower bound of n for array length

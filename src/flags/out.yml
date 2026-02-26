@@ -1,0 +1,4 @@
+long: --out
+short: -o
+arg: out
+help: a csv file to store timings in

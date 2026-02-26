@@ -1,0 +1,5 @@
+long: --iter
+short: -i
+arg: iter
+default: "25"
+help: number of times each size of n will be tested

@@ -1,0 +1,5 @@
+long: --step
+short: -s
+arg: step
+default: "500"
+help: size of steps for n to use

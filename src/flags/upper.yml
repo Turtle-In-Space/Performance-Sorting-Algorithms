@@ -1,0 +1,5 @@
+long: --upper
+short: -u
+arg: upper
+default: "10000"
+help: upper bound of n for array length
