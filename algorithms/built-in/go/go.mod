@@ -1,4 +1,4 @@
-module built-in/sort
+module built-in/sort.out
 
 go 1.25.0
 

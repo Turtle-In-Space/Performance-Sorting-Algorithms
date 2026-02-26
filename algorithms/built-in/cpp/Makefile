@@ -1,8 +1,8 @@
 CC = g++
 CFLAGS = -std=c++20 -Werror -Wall -Wextra -Wpedantic -Wmissing-declarations -O3 -march=native
 
-BIN = sort
-SRC = $(BIN).cpp
+BIN = sort.out
+SRC = $(BIN:%.out=%.cpp)
 OBJ := $(SRC:%.cpp=%.o)
 
 all: $(BIN)
