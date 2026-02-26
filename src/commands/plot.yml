@@ -9,5 +9,8 @@ flags:
     help: which axis to apply logscale to
     allowed: [x, y, xy]
 
+  - import: src/flags/algo.yml
+  - import: src/flags/lang.yml
+
 examples:
   - benchmark plot

@@ -216,6 +216,16 @@ benchmark.sh_plot_usage() {
     printf "    %s\n" "Allowed: x, y, xy"
     echo
 
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--algo ALGO")"
+    printf "    Name of sorting algorithms [SORT1,SORT2,...]\n"
+    echo
+
+    # :flag.usage
+    printf "  %s\n" "$(magenta "--lang LANG")"
+    printf "    Name of coding languaes [LANG1,LANG2,...]\n"
+    echo
+
     # :command.usage_fixed_flags
     printf "  %s\n" "$(magenta "--help, -h")"
     printf "    Show this help\n"
@@ -463,7 +473,7 @@ send_completions() {
   echo $'      ;;'
   echo $''
   echo $'    \'plot\'*)'
-  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--help --logscale -h -l")" -- "$cur")'
+  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--algo --help --lang --logscale -h -l")" -- "$cur")'
   echo $'      ;;'
   echo $''
   echo $'    \'run\'*)'
@@ -629,8 +639,13 @@ benchmark.sh_plot_command() {
 
   # src/commands/plot.sh
   names=()
+  files=()
 
-  mapfile -t files < <(find $algos_folder -name "*.csv")
+  programs=$(get_program_folders)
+  for dir in $programs; do
+    files+=$(find $dir -name "*.csv")
+    files+=" "
+  done;
 
   # make filepath into proper name
   for f in "${files[@]}"; do
@@ -1093,6 +1108,34 @@ benchmark.sh_plot_parse_requirements() {
           shift
         else
           printf "%s\n" "--logscale requires an argument: --logscale, -l LOGSCALE" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --algo)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--algo']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--algo requires an argument: --algo ALGO" >&2
+          exit 1
+        fi
+        ;;
+
+      # :flag.case
+      --lang)
+
+        # :flag.case_arg
+        if [[ -n ${2+x} ]]; then
+          args['--lang']="$2"
+          shift
+          shift
+        else
+          printf "%s\n" "--lang requires an argument: --lang LANG" >&2
           exit 1
         fi
         ;;

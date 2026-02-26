@@ -1,6 +1,11 @@
 names=()
+files=()
 
-mapfile -t files < <(find $algos_folder -name "*.csv")
+programs=$(get_program_folders)
+for dir in $programs; do
+  files+=$(find $dir -name "*.csv")
+  files+=" "
+done;
 
 # make filepath into proper name
 for f in "${files[@]}"; do

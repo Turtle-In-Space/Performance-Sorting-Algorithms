@@ -51,7 +51,7 @@ send_completions() {
   echo $'      ;;'
   echo $''
   echo $'    \'plot\'*)'
-  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--help --logscale -h -l")" -- "$cur")'
+  echo $'      while read -r; do COMPREPLY+=("$REPLY"); done < <(compgen -W "$(_benchmark.sh_completions_filter "--algo --help --lang --logscale -h -l")" -- "$cur")'
   echo $'      ;;'
   echo $''
   echo $'    \'run\'*)'
