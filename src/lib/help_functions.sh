@@ -20,3 +20,14 @@ get_program_folders() {
 
   printf '%s\n' "${results[@]}"
 }
+
+exec_cmd() {
+  local dir="$1"
+  local cmd="$2"
+  local msg="$3"
+
+  print_info "$3: " $dir
+  if ! eval $cmd; then
+    print_warn "$3 failed for $dir"
+  fi
+}
