@@ -5,13 +5,12 @@ programs=$(get_program_folders)
 for dir in $programs; do
   files+=$(find $dir -name "*.csv")
   files+=" "
-done;
-
-# make filepath into proper name
-for f in "${files[@]}"; do
+  
+  # make filepath into proper name
   # strip algo folder, remove slashes and add to names
-  names+=("$(dirname ${f#"$algos_folder"} | sed 's/\//-/')")
-done
+  names+=$(echo ${dir#"$algos_folder/"} | sed 's/\//-/')
+  names+=" "
+done;
 
 files_str="${files[*]}"
 names_str="${names[*]}"
