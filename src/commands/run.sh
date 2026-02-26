@@ -25,13 +25,13 @@ exec_run() {
         run $dir "java -jar $dir/target/sort.jar ${tmp[@]}"
       ;;
       go)
-        run $dir "./$dir/sort ${tmp[@]}"
+        run $dir "./$dir/sort.out ${tmp[@]}"
       ;;
       python)
         run $dir "python3 $dir/sort.py ${tmp[@]}"
       ;;
       c | cpp)
-        run $dir "./$dir/sort ${tmp[@]}"
+        run $dir "./$dir/sort.out ${tmp[@]}"
       ;;
     esac
   done;

@@ -590,7 +590,7 @@ benchmark.sh_build_command() {
           exec_cmd $dir "mvn package -q -f $dir" "Building"
         ;;
         go)
-          exec_cmd $dir "go build -C $dir -o sort.out" "Building"
+          exec_cmd $dir "go build -C $dir" "Building"
         ;;
         python)
         ;;
@@ -686,13 +686,13 @@ benchmark.sh_run_command() {
           run $dir "java -jar $dir/target/sort.jar ${tmp[@]}"
         ;;
         go)
-          run $dir "./$dir/sort ${tmp[@]}"
+          run $dir "./$dir/sort.out ${tmp[@]}"
         ;;
         python)
           run $dir "python3 $dir/sort.py ${tmp[@]}"
         ;;
         c | cpp)
-          run $dir "./$dir/sort ${tmp[@]}"
+          run $dir "./$dir/sort.out ${tmp[@]}"
         ;;
       esac
     done;
