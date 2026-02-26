@@ -1,7 +1,11 @@
-# ------ Java ------ 
+# ------ Java ------------ #
 ## User-specific stuff
 .idea/
 target/
 
-# ------ Project ------ 
+# ------ Project --------- #
 algorithms/**/*.csv
+
+# ------ C/C++ ----------- #
+*.out
+*.o
