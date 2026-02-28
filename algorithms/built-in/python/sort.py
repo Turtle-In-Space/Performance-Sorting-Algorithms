@@ -25,6 +25,10 @@ def time_sort(data: List[int], iterations: int) -> int:
     return time_ns() - start
 
 def write_time(elapsed: float, n: int, fileName: str) -> None:
+    if fileName == None or fileName == "":
+        print(f"{n}:\t{elapsed}") 
+        return
+
     with open(fileName, "a") as file:
         out = f"{n}, {elapsed}\n"
         file.write(out)
@@ -45,13 +49,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.out != None:
-        open(args.out, "w")
+        with open(args.out, "w") as f:
+            f.close()
     
     for n in range(args.lower, args.upper + 1, args.step):
         data = create_array(n) 
         elapsed = time_sort(data, args.iter)
-
-        if args.out != None:
-            write_time(elapsed/args.iter, n, args.out)
-        else:
-            print(f"{n}:\t{elapsed/args.iter}")
+        elapsed = elapsed/args.iter
+        write_time(elapsed, n, args.out)

@@ -99,7 +99,7 @@ func main() {
 	parseOpts()
 	tryCreateFile()
 
-	if *optHelp || len(os.Args) == 1 {
+	if *optHelp || len(os.Args) < 8 {
 		getopt.Usage()
 		os.Exit(0)
 	}
